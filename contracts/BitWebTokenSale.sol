@@ -39,7 +39,7 @@ contract BitWebTokenSale {
     bool public saleFinalized = false;             // Has BitWeb Labs finalized the sale?
     bool public activated = false;                 // Is the token sale activated
 
-    ThetaToken public token;                       // The token
+    BeamToken public token;                       // The token
 
     uint constant public decimals = 18;
     uint public minimalPayment = 1 ether;           // Minimum payment
@@ -51,7 +51,7 @@ contract BitWebTokenSale {
     event RemoveFromWhitelist(address addr);
 
 
-    function ThetaTokenSale(
+    function BitWebTokenSale(
         address _root,
         address _admin,
         address _whitelistController,
@@ -65,7 +65,7 @@ contract BitWebTokenSale {
         non_zero_address(_admin)
         non_zero_address(_whitelistController)
         non_zero_address(_exchangeRateController)
-        non_zero_address(_thetaLabsReserve) 
+        non_zero_address(_bitwebLabsReserve) 
         non_zero_address(_fundDeposit) public {
         require(_initialBlock >= getBlockNumber());
         require(_initialBlock < _finalBlock);
@@ -134,7 +134,7 @@ contract BitWebTokenSale {
         only(admin)
         public {
         uint reserveAmount = calcReserve(_amount);
-        require(token.mint(thetaLabsReserve, reserveAmount));
+        require(token.mint(bitwebLabsReserve, reserveAmount));
         require(token.mint(_recipient, _amount));
     }
 
@@ -142,7 +142,7 @@ contract BitWebTokenSale {
         return whitelistMap[account];
     }
 
-    // @notice Add accounts to the white list. Only whitelisted accounts can buy Theta tokens
+    // @notice Add accounts to the white list. Only whitelisted accounts can buy BEAM tokens
     function addAccountsToWhitelist(address[] _accounts) only(whitelistController) public {
         for (uint i = 0; i < _accounts.length; i ++) {
             address account = _accounts[i];
@@ -193,7 +193,7 @@ contract BitWebTokenSale {
 
         // Allocate tokens. This will fail after sale is finalized in case it is hidden cap finalized.
         uint reserveTokens = calcReserve(boughtTokens);
-        require(token.mint(thetaLabsReserve, reserveTokens));
+        require(token.mint(bitwebLabsReserve, reserveTokens));
         require(token.mint(_owner, boughtTokens));
 
         // Save total collected amount
