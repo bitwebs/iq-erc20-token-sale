@@ -1,24 +1,24 @@
-var ThetaToken = artifacts.require('ThetaToken');
-var ThetaTokenSale = artifacts.require('ThetaTokenSale');
+var BeamToken = artifacts.require('BeamToken');
+var BitWebTokenSale = artifacts.require('BitWebTokenSale');
 
 module.exports = function (deployer, network, accounts) {
-    var thetaToken;
-    var thetaTokenSale;
+    var beamToken;
+    var bitwebTokenSale;
 
     console.log('---------4----------');
-    ThetaToken.deployed()
+    BeamToken.deployed()
         .then(function(token) {
-            thetaToken = token;
-            return ThetaTokenSale.deployed();
+            beamToken = token;
+            return BitWebTokenSale.deployed();
         })
         .then(function (token_sale) {
-            thetaTokenSale = token_sale;
-            console.log('Changing thetaToken controller...');
-            return thetaToken.changeController(thetaTokenSale.address);
+            bitwebTokenSale = token_sale;
+            console.log('Changing beamToken controller...');
+            return beamToken.changeController(bitwebTokenSale.address);
         })
         .then(function() {
-            console.log('Setting thetaToken in thetaTokenSale...');
-            return thetaTokenSale.setThetaToken(thetaToken.address);
+            console.log('Setting beamToken in bitwebTokenSale...');
+            return bitwebTokenSale.setThetaToken(beamToken.address);
         })
         .then(function() {
             console.log('---DEPLOY FINISHED---');
