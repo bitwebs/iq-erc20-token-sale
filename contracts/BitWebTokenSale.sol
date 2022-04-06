@@ -2,14 +2,15 @@ pragma solidity ^0.4.18;
 
 
 import "./SafeMath.sol";
-import "./ThetaToken.sol";
+import "./BeamToken.sol";
 
 
 //
 //    Copyright 2017, Theta Labs, Inc.
+//    Copyright 2022, BitWeb Labs
 //
 
-contract ThetaTokenSale {
+contract BitWebTokenSale {
 
     using SafeMath for uint;
 
@@ -21,7 +22,7 @@ contract ThetaTokenSale {
 
     address internal exchangeRateController;
 
-    address internal thetaLabsReserve;
+    address internal bitwebLabsReserve;
 
     address internal fundDeposit;
 
@@ -29,13 +30,13 @@ contract ThetaTokenSale {
 
     uint public finalBlock;               // Block number indicating when the sale ends. Exclusive, sale will be closed at ends block.
 
-    mapping (address => bool) public whitelistMap; // Only the accounts in white list can buy theta tokens
+    mapping (address => bool) public whitelistMap; // Only the accounts in white list can buy BEAM tokens
 
-    uint public exchangeRate;                      // Exchange rate between 1 wei-Theta and 1 wei-Ether (18 decimals)
+    uint public exchangeRate;                      // Exchange rate between 1 wei-Beam and 1 wei-Ether (18 decimals)
 
     uint internal fundCollected = 0;              // ETH in wei
-    bool public saleStopped = false;               // Has Theta Labs stopped the sale?
-    bool public saleFinalized = false;             // Has Theta Labs finalized the sale?
+    bool public saleStopped = false;               // Has BitWeb Labs stopped the sale?
+    bool public saleFinalized = false;             // Has BitWeb Labs finalized the sale?
     bool public activated = false;                 // Is the token sale activated
 
     ThetaToken public token;                       // The token
@@ -55,7 +56,7 @@ contract ThetaTokenSale {
         address _admin,
         address _whitelistController,
         address _exchangeRateController,
-        address _thetaLabsReserve,
+        address _bitwebLabsReserve,
         address _fundDeposit,
         uint _initialBlock,
         uint _finalBlock,
@@ -78,19 +79,19 @@ contract ThetaTokenSale {
         admin = _admin;
         whitelistController = _whitelistController;
         exchangeRateController = _exchangeRateController;
-        thetaLabsReserve = _thetaLabsReserve;
+        bitwebLabsReserve = _bitwebLabsReserve;
         fundDeposit = _fundDeposit;
         initialBlock = _initialBlock;
         finalBlock = _finalBlock;
         exchangeRate = _exchangeRate;
     }
 
-    function setThetaToken(address _token)
+    function setBeamToken(address _token)
         non_zero_address(_token)
         only(admin)
         public {
 
-        token = ThetaToken(_token);
+        token = BeamToken(_token);
         require(token.controller() == address(this)); // tokenSale is controller
     }
 
@@ -233,10 +234,10 @@ contract ThetaTokenSale {
         saleStopped = true;
     }
 
-    function changeThetaLabsReserve(address _newThetaLabsReserve) 
-        non_zero_address(_newThetaLabsReserve)
+    function changeBitWebLabsReserve(address _newBitWebLabsReserve) 
+        non_zero_address(_newBitWebLabsReserve)
         only(admin) public {
-        thetaLabsReserve = _newThetaLabsReserve;
+        bitwebLabsReserve = _newBitWebLabsReserve;
     }
 
     function changeFundDeposit(address _newFundDeposit) 
@@ -325,8 +326,8 @@ contract ThetaTokenSale {
         return exchangeRateController;
     }
 
-    function getThetaLabsReserve() constant public only(admin) returns (address) {
-        return thetaLabsReserve;
+    function getBitWebLabsReserve() constant public only(admin) returns (address) {
+        return bitwebLabsReserve;
     }
 
     function getFundDeposit() constant public only(admin) returns (address) {
