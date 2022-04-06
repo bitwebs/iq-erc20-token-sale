@@ -1,5 +1,5 @@
-var ThetaToken = artifacts.require('ThetaToken');
-var ThetaTokenSale = artifacts.require('ThetaTokenSale');
+var BeamToken = artifacts.require('BeamToken');
+var BitWebTokenSale = artifacts.require('BitWebTokenSale');
 var TimelockedSafe = artifacts.require('TimelockedSafe');
 
 
@@ -10,47 +10,47 @@ contract('TimelockedSafeTest', function(accounts) {
     var admin_addr    = accounts[1];
     var whitelist_controller    = accounts[2];
     var exchange_rate_controller = accounts[3];
-    var thetalab_reserve_addr = accounts[4];
+    var bitweblab_reserve_addr = accounts[4];
     var fund_deposit_addr = accounts[5];
     var presale_addr = accounts[6];
     var sliver_integration_addr = accounts[7];
     var streamer_addr = accounts[8];
     var public_sale_addr = accounts[9];
 
-    var widthdraw_addr = thetalab_reserve_addr;
+    var widthdraw_addr = bitweblab_reserve_addr;
     var attacker_addr = public_sale_addr;
 
-    var theta_token;
-    var theta_token_sale;
+    var beam_token;
+    var bitweb_token_sale;
     var timelocked_safe;
     var unlock_time = 0; // simulate the case where the token is unlocked
     var presale_amount = new web3.BigNumber(250000000 * Math.pow(10, 18)); // 250 million tokens
 
     it ("TimelockedSafe test: deploy", function() {
         console.log('----------------');
-        return ThetaToken.deployed()
+        return BeamToken.deployed()
             .then(function(tt) {
-                theta_token = tt;
-                console.log('ThetaToken Address: ' + theta_token.address);
-                return ThetaTokenSale.deployed();
+                beam_token = tt;
+                console.log('BeamToken Address: ' + beam_token.address);
+                return BitWebTokenSale.deployed();
             })
             .then(function(tts) {
-                theta_token_sale = tts;
-                console.log('ThetaTokenSale Address: ' + theta_token_sale.address);
+                bitweb_token_sale = tts;
+                console.log('BitWebTokenSale Address: ' + bitweb_token_sale.address);
                 return TimelockedSafe.deployed();
             })
             .then(function(tls) {
                 timelocked_safe = tls;
-                timelocked_safe.changeTokenAddress(theta_token.address, {from: admin_addr, gas:4700000});
+                timelocked_safe.changeTokenAddress(beam_token.address, {from: admin_addr, gas:4700000});
                 console.log('TimelockedSafe Address: ' + timelocked_safe.address);
             })
     });
 
     it ("TimelockedSafe test: set unlock time", function() {
         console.log('----------------');
-        return theta_token_sale.changeUnlockTime(unlock_time, {from: admin_addr, gas:4700000})
+        return bitweb_token_sale.changeUnlockTime(unlock_time, {from: admin_addr, gas:4700000})
             .then(function() {
-                return theta_token.getUnlockTime();
+                return beam_token.getUnlockTime();
             })
             .then(function(res) {
                 console.log('Unlock time: ' + res);
@@ -59,16 +59,16 @@ contract('TimelockedSafeTest', function(accounts) {
 
     it ("TimelockedSafe test: presale to generate tokens", function() {
         console.log('----------------');
-        return theta_token_sale.allocatePresaleTokens(presale_addr, presale_amount, {from: admin_addr, gas:4700000})
+        return bitweb_token_sale.allocatePresaleTokens(presale_addr, presale_amount, {from: admin_addr, gas:4700000})
             .then(function() {
-                return theta_token.balanceOf(presale_addr);
+                return beam_token.balanceOf(presale_addr);
             })
             .then(function(res) {
                 console.log('Balance of presale account ' + presale_addr + ' is ' + res)
-                return theta_token.balanceOf(thetalab_reserve_addr);
+                return beam_token.balanceOf(bitweblab_reserve_addr);
             })
             .then(function(res) {
-                console.log('Balance of thetaLab reserve account ' + thetalab_reserve_addr + ' is ' + res)
+                console.log('Balance of bitwebLab reserve account ' + bitweblab_reserve_addr + ' is ' + res)
             })
     });
 
@@ -109,18 +109,18 @@ contract('TimelockedSafeTest', function(accounts) {
         var vesting_period_in_months = 6;
         var monthly_widthraw_limit_in_wei = new web3.BigNumber(10 ** decimals).times(5).times(10 ** 6); // 5 million tokens monthly limit
         var safe_initial_balance = new web3.BigNumber(10 ** decimals).times(30).times(10 ** 6); // 30 million tokens initially
-        return theta_token.balanceOf(timelocked_safe.address)
+        return beam_token.balanceOf(timelocked_safe.address)
             .then(function(bal) {
                 bal0 = bal;
-                console.log('Initial Theta token balance of timelocked safe ' + timelocked_safe + ' is ' + bal0);
-                return theta_token.transfer(timelocked_safe.address, safe_initial_balance, {from: thetalab_reserve_addr, gas:4700000});
+                console.log('Initial Beam token balance of timelocked safe ' + timelocked_safe + ' is ' + bal0);
+                return beam_token.transfer(timelocked_safe.address, safe_initial_balance, {from: bitweblab_reserve_addr, gas:4700000});
             })
             .then(function() {
-                return theta_token.balanceOf(timelocked_safe.address);
+                return beam_token.balanceOf(timelocked_safe.address);
             })
             .then(function(bal) {
                 bal1 = bal;
-                console.log('Theta token balance of timelocked safe after the first transfer is ' + bal1);
+                console.log('Beam token balance of timelocked safe after the first transfer is ' + bal1);
                 return timelocked_safe.changeLockingPeriod(locking_period_in_months, {from: admin_addr, gas:4700000});
             })
             .then(function() {
@@ -138,58 +138,58 @@ contract('TimelockedSafeTest', function(accounts) {
         var withdraw_amount_in_wei_2 = new web3.BigNumber(10 ** decimals).times(4).times(10 ** 6); 
         var withdraw_amount_in_wei_3 = new web3.BigNumber(10 ** decimals).times(1.2).times(10 ** 6); 
 
-        return theta_token.balanceOf(timelocked_safe.address)
+        return beam_token.balanceOf(timelocked_safe.address)
             .then(function(bal) {
                 safe_bal0 = new web3.BigNumber(bal);
-                console.log('Theta token balance of timelocked safe  ' + timelocked_safe.address + ' is ' + safe_bal0);
-                return theta_token.balanceOf(widthdraw_addr);
+                console.log('Beam token balance of timelocked safe  ' + timelocked_safe.address + ' is ' + safe_bal0);
+                return beam_token.balanceOf(widthdraw_addr);
             })
             .then(function(bal) {
                 withdraw_bal0 = new web3.BigNumber(bal);
-                console.log('Theta token balance of withdraw address ' + widthdraw_addr + ' is ' + withdraw_bal0);
-                console.log('>>>>> Withdraw ' + withdraw_amount_in_wei_1 + ' wei Theta tokens...')
+                console.log('Beam token balance of withdraw address ' + widthdraw_addr + ' is ' + withdraw_bal0);
+                console.log('>>>>> Withdraw ' + withdraw_amount_in_wei_1 + ' wei Beam tokens...')
                 return timelocked_safe.withdraw(withdraw_amount_in_wei_1);
             })
            .then(function(res) {
                 withdraw_status = Boolean(res);
                 console.log('>>>>> Withdraw status: ' + withdraw_status)
                 assert(withdraw_status);
-                return theta_token.balanceOf(timelocked_safe.address);
+                return beam_token.balanceOf(timelocked_safe.address);
             })
             .then(function(bal) {
                 safe_bal1 = new web3.BigNumber(bal);
-                console.log('Theta token balance of timelocked safe  ' + timelocked_safe.address + ' is ' + safe_bal1);
-                return theta_token.balanceOf(widthdraw_addr);
+                console.log('Beam token balance of timelocked safe  ' + timelocked_safe.address + ' is ' + safe_bal1);
+                return beam_token.balanceOf(widthdraw_addr);
             })
             .then(function(bal) {
                 withdraw_bal1 = new web3.BigNumber(bal);
-                console.log('Theta token balance of withdraw address ' + widthdraw_addr + ' is ' + withdraw_bal1);
+                console.log('Beam token balance of withdraw address ' + widthdraw_addr + ' is ' + withdraw_bal1);
                 
                 assert(safe_bal0.minus(withdraw_amount_in_wei_1).equals(safe_bal1));
                 assert(withdraw_bal1.minus(withdraw_amount_in_wei_1).equals(withdraw_bal0));
 
-                console.log('>>>>> Withdraw ' + withdraw_amount_in_wei_2 + ' wei Theta tokens...')
+                console.log('>>>>> Withdraw ' + withdraw_amount_in_wei_2 + ' wei Beam tokens...')
                 return timelocked_safe.withdraw(withdraw_amount_in_wei_2);
             })
            .then(function(res) {
                 withdraw_status = Boolean(res);
                 console.log('>>>>> Withdraw status: ' + withdraw_status)
                 assert(withdraw_status);
-                return theta_token.balanceOf(timelocked_safe.address);
+                return beam_token.balanceOf(timelocked_safe.address);
             })
             .then(function(bal) {
                 safe_bal2 = new web3.BigNumber(bal);
-                console.log('Theta token balance of timelocked safe  ' + timelocked_safe.address + ' is ' + safe_bal2);
-                return theta_token.balanceOf(widthdraw_addr);
+                console.log('Beam token balance of timelocked safe  ' + timelocked_safe.address + ' is ' + safe_bal2);
+                return beam_token.balanceOf(widthdraw_addr);
             })
             .then(function(bal) {
                 withdraw_bal2 = new web3.BigNumber(bal);
-                console.log('Theta token balance of withdraw address ' + widthdraw_addr + ' is ' + withdraw_bal2);
+                console.log('Beam token balance of withdraw address ' + widthdraw_addr + ' is ' + withdraw_bal2);
 
                 assert(safe_bal1.minus(withdraw_amount_in_wei_2).equals(safe_bal2));
                 assert(withdraw_bal2.minus(withdraw_amount_in_wei_2).equals(withdraw_bal1));
 
-                console.log('>>>>> Attempt to withdraw ' + withdraw_amount_in_wei_3 + ' wei Theta tokens...')
+                console.log('>>>>> Attempt to withdraw ' + withdraw_amount_in_wei_3 + ' wei Beam tokens...')
                 return timelocked_safe.withdraw(withdraw_amount_in_wei_3);
             })
             .catch(function() {
@@ -218,33 +218,33 @@ contract('TimelockedSafeTest', function(accounts) {
                 updated_start_time = Number(res);
                 updated_start_time_date = new Date(updated_start_time * 1000);
                 console.log('Updated start time: ' + updated_start_time + ' (' + updated_start_time_date.toUTCString() + ')');
-                return theta_token.balanceOf(timelocked_safe.address);
+                return beam_token.balanceOf(timelocked_safe.address);
             })
             .then(function(bal) {
                 safe_bal0 = new web3.BigNumber(bal);
-                console.log('Theta token balance of timelocked safe  ' + timelocked_safe.address + ' is ' + safe_bal0);
-                return theta_token.balanceOf(widthdraw_addr);
+                console.log('Beam token balance of timelocked safe  ' + timelocked_safe.address + ' is ' + safe_bal0);
+                return beam_token.balanceOf(widthdraw_addr);
             })
             .then(function(bal) {
                 withdraw_bal0 = new web3.BigNumber(bal);
-                console.log('Theta token balance of withdraw address ' + widthdraw_addr + ' is ' + withdraw_bal0);
-                console.log('>>>>> Withdraw ' + second_month_withdraw_amount_in_wei + ' wei Theta tokens...')
+                console.log('Beam token balance of withdraw address ' + widthdraw_addr + ' is ' + withdraw_bal0);
+                console.log('>>>>> Withdraw ' + second_month_withdraw_amount_in_wei + ' wei Beam tokens...')
                 return timelocked_safe.withdraw(second_month_withdraw_amount_in_wei);
             })
            .then(function(res) {
                 withdraw_status = Boolean(res);
                 console.log('>>>>> Withdraw status: ' + withdraw_status)
                 assert(withdraw_status);
-                return theta_token.balanceOf(timelocked_safe.address);
+                return beam_token.balanceOf(timelocked_safe.address);
             })
             .then(function(bal) {
                 safe_bal1 = new web3.BigNumber(bal);
-                console.log('Theta token balance of timelocked safe  ' + timelocked_safe.address + ' is ' + safe_bal1);
-                return theta_token.balanceOf(widthdraw_addr);
+                console.log('Beam token balance of timelocked safe  ' + timelocked_safe.address + ' is ' + safe_bal1);
+                return beam_token.balanceOf(widthdraw_addr);
             })
             .then(function(bal) {
                 withdraw_bal1 = new web3.BigNumber(bal);
-                console.log('Theta token balance of withdraw address ' + widthdraw_addr + ' is ' + withdraw_bal1);
+                console.log('Beam token balance of withdraw address ' + widthdraw_addr + ' is ' + withdraw_bal1);
 
                 assert(safe_bal0.minus(second_month_withdraw_amount_in_wei).equals(safe_bal1));
                 assert(withdraw_bal1.minus(second_month_withdraw_amount_in_wei).equals(withdraw_bal0));
@@ -286,10 +286,10 @@ contract('TimelockedSafeTest', function(accounts) {
                 current_start_time = Number(res);
                 current_start_time_date = new Date(current_start_time * 1000);
                 console.log('Current start time: ' + current_start_time + ' (' + current_start_time_date.toUTCString() + ')');
-                return theta_token.balanceOf(timelocked_safe.address);
+                return beam_token.balanceOf(timelocked_safe.address);
             })
             .then(function() {
-                console.log('>>>>> Attempt to withdraw ' + withdraw_amount_in_wei + ' Wei Theta tokens...');
+                console.log('>>>>> Attempt to withdraw ' + withdraw_amount_in_wei + ' Wei Beam tokens...');
                 return timelocked_safe.withdraw(withdraw_amount_in_wei);
             })
             .catch(function() {
@@ -307,39 +307,39 @@ contract('TimelockedSafeTest', function(accounts) {
                 updated_start_time = Number(res);
                 updated_start_time_date = new Date(updated_start_time * 1000);
                 console.log('Updated start time: ' + updated_start_time + ' (' + updated_start_time_date.toUTCString() + ')');
-                return theta_token.balanceOf(timelocked_safe.address);
+                return beam_token.balanceOf(timelocked_safe.address);
             })
             .then(function() {
                 return timelocked_safe.finalizeConfig({from: admin_addr, gas:4700000});
             })
             .then(function() {
-                return theta_token.balanceOf(timelocked_safe.address);
+                return beam_token.balanceOf(timelocked_safe.address);
             })
             .then(function(bal) {
                 safe_bal0 = new web3.BigNumber(bal);
-                console.log('Theta token balance of timelocked safe  ' + timelocked_safe.address + ' is ' + safe_bal0);
-                return theta_token.balanceOf(widthdraw_addr);
+                console.log('Beam token balance of timelocked safe  ' + timelocked_safe.address + ' is ' + safe_bal0);
+                return beam_token.balanceOf(widthdraw_addr);
             })
             .then(function(bal) {
                 withdraw_bal0 = new web3.BigNumber(bal);
-                console.log('Theta token balance of withdraw address ' + widthdraw_addr + ' is ' + withdraw_bal0);
-                console.log('>>>>> Withdraw ' + one_time_withdraw_amount_in_wei + ' Wei Theta tokens...');
+                console.log('Beam token balance of withdraw address ' + widthdraw_addr + ' is ' + withdraw_bal0);
+                console.log('>>>>> Withdraw ' + one_time_withdraw_amount_in_wei + ' Wei Beam tokens...');
                 return timelocked_safe.withdraw(one_time_withdraw_amount_in_wei);
             })
             .then(function(res) {
                 withdraw_status = Boolean(res);
                 console.log('>>>>> Withdraw status: ' + withdraw_status)
                 assert(withdraw_status);
-                return theta_token.balanceOf(timelocked_safe.address);
+                return beam_token.balanceOf(timelocked_safe.address);
             })
             .then(function(bal) {
                 safe_bal1 = new web3.BigNumber(bal);
-                console.log('Theta token balance of timelocked safe  ' + timelocked_safe.address + ' is ' + safe_bal1);
-                return theta_token.balanceOf(widthdraw_addr);
+                console.log('Beam token balance of timelocked safe  ' + timelocked_safe.address + ' is ' + safe_bal1);
+                return beam_token.balanceOf(widthdraw_addr);
             })
             .then(function(bal) {
                 withdraw_bal1 = new web3.BigNumber(bal);
-                console.log('Theta token balance of withdraw address ' + widthdraw_addr + ' is ' + withdraw_bal1);
+                console.log('Beam token balance of withdraw address ' + widthdraw_addr + ' is ' + withdraw_bal1);
                 assert(safe_bal0.minus(one_time_withdraw_amount_in_wei).equals(safe_bal1));
                 assert(withdraw_bal1.minus(one_time_withdraw_amount_in_wei).equals(withdraw_bal0));
                 return timelocked_safe.adminAddress.call();

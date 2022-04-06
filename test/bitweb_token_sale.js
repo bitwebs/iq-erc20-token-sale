@@ -1,52 +1,52 @@
-var ThetaToken = artifacts.require('ThetaToken');
-var ThetaTokenSale = artifacts.require('ThetaTokenSale');
-contract('ThetaTokenSale', function(accounts) {
+var BeamToken = artifacts.require('BeamToken');
+var BitWebTokenSale = artifacts.require('BitWebTokenSale');
+contract('BitWebTokenSale', function(accounts) {
     var thetaToken;
-    var thetaTokenSale;
+    var bitwebTokenSale;
     var wallet;
 
     var precirculationAccount;
     console.log("Imported node Accounts: \n", accounts);
 
-    it ("ThetaTokenSale: deploy", function() {
+    it ("BitWebTokenSale: deploy", function() {
         console.log('----------------');
-        return ThetaToken.deployed()
+        return BeamToken.deployed()
             .then(function(tt) {
                 thetaToken = tt;
-                console.log('ThetaToken Address: ' + thetaToken.address);
-                return ThetaTokenSale.deployed();
+                console.log('BeamToken Address: ' + thetaToken.address);
+                return BitWebTokenSale.deployed();
                 //return thetaToken.getController();
             })
             .then(function(tts) {
-                thetaTokenSale = tts;
-                console.log('ThetaTokenSale Address: ' + thetaTokenSale.address);
-                return thetaTokenSale.token.call();
+                bitwebTokenSale = tts;
+                console.log('BitWebTokenSale Address: ' + bitwebTokenSale.address);
+                return bitwebTokenSale.token.call();
             })
             .then(function(token_reference_in_token_sale) {
-                console.log('thetaTokenSale.token is ' + token_reference_in_token_sale);
-                assert.equal(thetaToken.address, token_reference_in_token_sale, 'thetaTokenSale\'s token is not thetaToken');
+                console.log('bitwebTokenSale.token is ' + token_reference_in_token_sale);
+                assert.equal(thetaToken.address, token_reference_in_token_sale, 'bitwebTokenSale\'s token is not thetaToken');
                 return thetaToken.controller.call();
             })
             .then(function(tt_controller) {
                 console.log('thetaToken.controller is: ' + tt_controller);
-                assert.equal(thetaTokenSale.address, tt_controller, 'thetaToken\'s controller is not thetaTokenSale');
+                assert.equal(bitwebTokenSale.address, tt_controller, 'thetaToken\'s controller is not bitwebTokenSale');
             });
     });
 
-    it ("ThetaTokenSale: activate sale", function() {
+    it ("BitWebTokenSale: activate sale", function() {
         console.log('----------------');
         console.log('Activating sale..');
-        return thetaTokenSale.activated.call()
+        return bitwebTokenSale.activated.call()
             .then(function(res) {
                 console.log('Sale activation status: ' + res.toString());
                 assert.equal(res, false, 'sale activation to be false at the beginning');
             })
             .then(function() {
                 console.log('Calling activate sale..');
-                return thetaTokenSale.activateSale({from: accounts[1], gas: 4700000}); 
+                return bitwebTokenSale.activateSale({from: accounts[1], gas: 4700000}); 
             })
             .then(function() {
-                return thetaTokenSale.activated.call();
+                return bitwebTokenSale.activated.call();
             })
             .then(function(res) {
                 console.log('Sale activation status: ' + res.toString());
@@ -54,10 +54,10 @@ contract('ThetaTokenSale', function(accounts) {
             })
             .then(function() {
                 console.log('Calling deactivate sale..');
-                return thetaTokenSale.deactivateSale({from: accounts[1], gas: 4700000}); 
+                return bitwebTokenSale.deactivateSale({from: accounts[1], gas: 4700000}); 
             })
             .then(function() {
-                return thetaTokenSale.activated.call();
+                return bitwebTokenSale.activated.call();
             })
             .then(function(res) {
                 console.log('Sale activation status: ' + res.toString());
@@ -65,14 +65,14 @@ contract('ThetaTokenSale', function(accounts) {
             });
     });
     
-    it("ThetaTokenSale: modify precirculation", function() {
+    it("BitWebTokenSale: modify precirculation", function() {
         console.log('----------------');
         precirculationAccount = accounts[9];
         console.log('Add address ' + precirculationAccount + ' to precirculation:');
-        return thetaTokenSale.allowPrecirculation(precirculationAccount, {from: accounts[1], gas: 4700000})
+        return bitwebTokenSale.allowPrecirculation(precirculationAccount, {from: accounts[1], gas: 4700000})
             .then(function() {
                 console.log('Check if address is added into precirculation..');
-                return thetaTokenSale.isPrecirculationAllowed(precirculationAccount, {from: accounts[1], gas: 4700000});
+                return bitwebTokenSale.isPrecirculationAllowed(precirculationAccount, {from: accounts[1], gas: 4700000});
             })
             .then(function(rest) {
                 console.log('Result from isPrecirculationAllowed(): ' + rest.valueOf());
@@ -80,11 +80,11 @@ contract('ThetaTokenSale', function(accounts) {
             })
             .then(function() {
                 console.log('Remove  ' + precirculationAccount + ' from precirculation:');
-                return thetaTokenSale.disallowPrecirculation(precirculationAccount, {from: accounts[1], gas: 4700000});
+                return bitwebTokenSale.disallowPrecirculation(precirculationAccount, {from: accounts[1], gas: 4700000});
             })
             .then(function() {
                 console.log('Check if address is removed from precirculation..');
-                return thetaTokenSale.isPrecirculationAllowed(precirculationAccount, {from: accounts[1], gas: 4700000});
+                return bitwebTokenSale.isPrecirculationAllowed(precirculationAccount, {from: accounts[1], gas: 4700000});
             })
             .then(function(rest) {
                 console.log('Result from isPrecirculationAllowed(): ' + rest.valueOf());
@@ -92,12 +92,12 @@ contract('ThetaTokenSale', function(accounts) {
             });
     });
 
-    it ("ThetaTokenSale: allocate presale tokens", function() {
+    it ("BitWebTokenSale: allocate presale tokens", function() {
         console.log('----------------');
         presale_receiver = accounts[6];
         presale_amount = new web3.BigNumber(543210);
         theta_reserve_amount = presale_amount.times(60).div(40);
-        return thetaTokenSale.getThetaLabsReserve()
+        return bitwebTokenSale.getThetaLabsReserve()
             .then(function(res) {
                 theta_reserve_address = res;
                 console.log('Theta reserve address : ' + theta_reserve_address);
@@ -112,7 +112,7 @@ contract('ThetaTokenSale', function(accounts) {
             .then(function(balance) {
                 presale_receiver_previous_balance = balance;
                 console.log('Presale receiver previous balance : ' + presale_receiver_previous_balance.toString(10));
-                return thetaTokenSale.allocatePresaleTokens(presale_receiver, presale_amount, {from: accounts[1], gas: 4700000});
+                return bitwebTokenSale.allocatePresaleTokens(presale_receiver, presale_amount, {from: accounts[1], gas: 4700000});
             })
             .then(function() {
                 return thetaToken.balanceOf(theta_reserve_address);
@@ -130,31 +130,31 @@ contract('ThetaTokenSale', function(accounts) {
             });
     });
 
-    it ("ThetaTokenSale: change hard caps", function() {
+    it ("BitWebTokenSale: change hard caps", function() {
         console.log('----------------');
-        return thetaTokenSale.tokenSaleHardCap.call()
+        return bitwebTokenSale.tokenSaleHardCap.call()
             .then(function(token_sale_hard_cap) {
                 console.log('Current token sale hard cap: ' + token_sale_hard_cap.toString());
                 new_token_sale_hard_cap = 31 * Math.pow(10, 6) * Math.pow(10, 18);
-                return thetaTokenSale.changeTokenSaleHardCap(new_token_sale_hard_cap, {from: accounts[1], gas: 4700000});
+                return bitwebTokenSale.changeTokenSaleHardCap(new_token_sale_hard_cap, {from: accounts[1], gas: 4700000});
             })
             .then(function() {
-                return thetaTokenSale.tokenSaleHardCap.call();
+                return bitwebTokenSale.tokenSaleHardCap.call();
             })
             .then(function(token_sale_hard_cap) {
                 console.log('Updated token sale hard cap: ' + token_sale_hard_cap.toString());
                 assert.equal(token_sale_hard_cap, new_token_sale_hard_cap, 'token sale hard cap should have changed!');
             })
             .then(function() {
-                return thetaTokenSale.fundCollectedHardCap.call();
+                return bitwebTokenSale.fundCollectedHardCap.call();
             })
             .then(function(fund_collected_hard_cap) {
                 console.log('Current fund collected hard cap: ' + fund_collected_hard_cap.toString());
                 new_fund_collected_hard_cap = 26000 * Math.pow(10, 18);
-                return thetaTokenSale.changeFundCollectedHardCap(new_fund_collected_hard_cap, {from: accounts[1], gas: 4700000});
+                return bitwebTokenSale.changeFundCollectedHardCap(new_fund_collected_hard_cap, {from: accounts[1], gas: 4700000});
             })
             .then(function() {
-                return thetaTokenSale.fundCollectedHardCap.call();
+                return bitwebTokenSale.fundCollectedHardCap.call();
             })
             .then(function(fund_collected_hard_cap) {
                 console.log('Updated fund collected hard cap: ' + fund_collected_hard_cap.toString());
@@ -162,19 +162,19 @@ contract('ThetaTokenSale', function(accounts) {
             });
     })
 
-    it ("ThetaTokenSale: modify whitelist controller", function() {
+    it ("BitWebTokenSale: modify whitelist controller", function() {
         console.log('----------------');
-        return thetaTokenSale.getWhitelistController()
+        return bitwebTokenSale.getWhitelistController()
             .then(function(res) {
                 old_whitelist_controller = res;
                 console.log('Old whitelist controller: ' + old_whitelist_controller);
             })
             .then(function() {
                 console.log('Changing whitelist controller to : ' + accounts[8]);
-                return thetaTokenSale.changeWhitelistController(accounts[8], {from: accounts[1], gas: 4700000});
+                return bitwebTokenSale.changeWhitelistController(accounts[8], {from: accounts[1], gas: 4700000});
             })
             .then(function() {
-                return thetaTokenSale.getWhitelistController({from: accounts[1], gas: 4700000});
+                return bitwebTokenSale.getWhitelistController({from: accounts[1], gas: 4700000});
             })
             .then(function(res) {
                 new_whitelist_controller = res;
@@ -184,19 +184,19 @@ contract('ThetaTokenSale', function(accounts) {
             });
     });
 
-    it ("ThetaTokenSale: modify exchangeRateController controller", function() {
+    it ("BitWebTokenSale: modify exchangeRateController controller", function() {
         console.log('----------------');
-        return thetaTokenSale.getExchangeRateController()
+        return bitwebTokenSale.getExchangeRateController()
             .then(function(res) {
                 old_exchange_rate_controller = res;
                 console.log('Old exchange rate controller: ' + old_exchange_rate_controller);
             })
             .then(function() {
                 console.log('Changing exchange rate controller to : ' + accounts[7]);
-                return thetaTokenSale.changeExchangeRateController(accounts[7], {from: accounts[1], gas: 4700000});
+                return bitwebTokenSale.changeExchangeRateController(accounts[7], {from: accounts[1], gas: 4700000});
             })
             .then(function() {
-                return thetaTokenSale.getExchangeRateController();
+                return bitwebTokenSale.getExchangeRateController();
             })
             .then(function(res) {
                 new_exchange_rate_controller = res;
@@ -206,61 +206,61 @@ contract('ThetaTokenSale', function(accounts) {
             });
     });
 
-    it ("ThetaTokenSale: use whitelist controller", function() {
+    it ("BitWebTokenSale: use whitelist controller", function() {
         console.log('----------------');
-        return thetaTokenSale.getWhitelistController()
+        return bitwebTokenSale.getWhitelistController()
             .then(function(res) {
                 whitelist_controller = res;
                 console.log('Current whitelist controller: ' + whitelist_controller);
                 console.log('Adding these accounts to whitelist: ' + accounts[6] + ' ' + accounts[7]);
-                return thetaTokenSale.addAccountsToWhitelist([accounts[6], accounts[7]], {from: whitelist_controller, gas:4700000});
+                return bitwebTokenSale.addAccountsToWhitelist([accounts[6], accounts[7]], {from: whitelist_controller, gas:4700000});
             })
             .then(function() {
-                return thetaTokenSale.isWhitelisted(accounts[6]);
+                return bitwebTokenSale.isWhitelisted(accounts[6]);
             })
             .then(function(res) {
                 console.log('is ' + accounts[6] + ' whitelisted? ' + res);
                 assert.equal(res, true, 'Account should have been whitelisted');
-                return thetaTokenSale.isWhitelisted(accounts[7]);
+                return bitwebTokenSale.isWhitelisted(accounts[7]);
             })
             .then(function(res) {
                 console.log('is ' + accounts[7] + ' whitelisted?' + res);
                 assert.equal(res, true, 'Account should have been whitelisted');
                 console.log('Removing account from whitelist:' + accounts[6] + ' ' + accounts[7]);
-                return thetaTokenSale.deleteAccountsFromWhitelist([accounts[6], accounts[7]], {from: whitelist_controller, gas:4700000});
+                return bitwebTokenSale.deleteAccountsFromWhitelist([accounts[6], accounts[7]], {from: whitelist_controller, gas:4700000});
             })
            .then(function() {
-                return thetaTokenSale.isWhitelisted(accounts[6]);
+                return bitwebTokenSale.isWhitelisted(accounts[6]);
             })
             .then(function(res) {
                 console.log('is ' + accounts[6] + ' whitelisted? ' + res);
                 assert.equal(res, false, 'Account should have been dewhitelisted');
-                return thetaTokenSale.isWhitelisted(accounts[7]);
+                return bitwebTokenSale.isWhitelisted(accounts[7]);
             })
             .then(function(res) {
                 console.log('is ' + accounts[7] + ' whitelisted? ' + res);
                 assert.equal(res, false, 'Account should have been dewhitelisted');
-                return thetaTokenSale.isWhitelisted(accounts[7]);
+                return bitwebTokenSale.isWhitelisted(accounts[7]);
             })
             ;
     });
 
-    it ("ThetaTokenSale: use exchange rate controller", function() {
+    it ("BitWebTokenSale: use exchange rate controller", function() {
         console.log('----------------');
-        return thetaTokenSale.exchangeRate.call()
+        return bitwebTokenSale.exchangeRate.call()
             .then(function(res) {
                 console.log('Exisitng exchange rate: ' + res);
-                return thetaTokenSale.getExchangeRateController();
+                return bitwebTokenSale.getExchangeRateController();
             })
             .then(function(res) {
                 exchange_rate_controller = res;
                 console.log('Existing exchange rate controller: ' + res);
                 new_exchange_rate = 12345;
                 console.log('Changing exchange rate to ' + new_exchange_rate.toString());
-                return thetaTokenSale.setExchangeRate(new_exchange_rate, {from: exchange_rate_controller, gas:4700000});
+                return bitwebTokenSale.setExchangeRate(new_exchange_rate, {from: exchange_rate_controller, gas:4700000});
             })
             .then(function() {
-                return thetaTokenSale.exchangeRate.call();
+                return bitwebTokenSale.exchangeRate.call();
             })
             .then(function(res) {
                 console.log('New exchange rate: ' + res);
@@ -269,45 +269,45 @@ contract('ThetaTokenSale', function(accounts) {
             ;
     });
 
-    it ("ThetaTokenSale: activate sell, emergency stop, restart sale", function() {
+    it ("BitWebTokenSale: activate sell, emergency stop, restart sale", function() {
         console.log('----------------');
-        return thetaTokenSale.getAdmin()
+        return bitwebTokenSale.getAdmin()
             .then(function(res) {
                 admin = res;
                 console.log('Current admin: ' + admin);
-                return thetaTokenSale.activated.call();
+                return bitwebTokenSale.activated.call();
             })
             .then(function(res) {
                 console.log('Sale activation status: ' + res);
                 assert.equal(res, false, 'Sale should be deactivated at first');
-                return thetaTokenSale.saleStopped.call();
+                return bitwebTokenSale.saleStopped.call();
             })
             .then(function(res) {
                 console.log('Sale stop status: ' + res);
                 assert.equal(res, false, 'Sale stop should be false at first');
                 console.log('Activating sale..');
-                return thetaTokenSale.activateSale({from: admin, gas: 4700000});
+                return bitwebTokenSale.activateSale({from: admin, gas: 4700000});
             })
             .then(function(res) {
-                return thetaTokenSale.activated.call();
+                return bitwebTokenSale.activated.call();
             })
             .then(function(res) {
                 console.log('Sale activation status: ' + res);
                 assert.equal(res, true, 'Sale should be activated after calling activate sale');
                 console.log('Calling emergency stop..')
-                return thetaTokenSale.emergencyStopSale({from: admin, gas: 4700000});
+                return bitwebTokenSale.emergencyStopSale({from: admin, gas: 4700000});
             })
             .then(function() {
-                return thetaTokenSale.saleStopped.call();
+                return bitwebTokenSale.saleStopped.call();
             })
             .then(function(res) {
                 console.log('Sale stop status: ' + res);
                 assert.equal(res, true, 'Sale stop should be true after calling emergency stop');
                 console.log('Calling restart sale..')
-                return thetaTokenSale.restartSale({from: admin, gas: 4700000});
+                return bitwebTokenSale.restartSale({from: admin, gas: 4700000});
             })
             .then(function() {
-                return thetaTokenSale.saleStopped.call();
+                return bitwebTokenSale.saleStopped.call();
             })
             .then(function(res) {
                 console.log('Sale stop status: ' + res);
@@ -316,22 +316,22 @@ contract('ThetaTokenSale', function(accounts) {
             ;
     });
 
-    it ("ThetaTokenSale: transfer fund deposit address", function() {
+    it ("BitWebTokenSale: transfer fund deposit address", function() {
         console.log('----------------');
-        return thetaTokenSale.getAdmin()
+        return bitwebTokenSale.getAdmin()
             .then(function(res) {
                 existing_admin = res;
                 console.log('Existing admin: ' + existing_admin);
-                return thetaTokenSale.getFundDeposit({from: existing_admin, gas: 4700000});
+                return bitwebTokenSale.getFundDeposit({from: existing_admin, gas: 4700000});
             })
             .then(function(res) {
                 existing_fund_deposit = res;
                 console.log('Existing fund deposit: ' + existing_fund_deposit);
                 new_fund_deposit_candidate = accounts[0];
-                return thetaTokenSale.changeFundDeposit(new_fund_deposit_candidate, {from: existing_admin, gas: 4700000});
+                return bitwebTokenSale.changeFundDeposit(new_fund_deposit_candidate, {from: existing_admin, gas: 4700000});
             })
             .then(function() {
-                return thetaTokenSale.getFundDeposit({from: existing_admin, gas: 4700000});
+                return bitwebTokenSale.getFundDeposit({from: existing_admin, gas: 4700000});
             })
             .then(function(res) {
                 new_fund_deposit = res;
@@ -341,22 +341,22 @@ contract('ThetaTokenSale', function(accounts) {
             ;
     });
 
-    it ("ThetaTokenSale: transfer thetaLab reserve address", function() {
+    it ("BitWebTokenSale: transfer thetaLab reserve address", function() {
         console.log('----------------');
-        return thetaTokenSale.getAdmin()
+        return bitwebTokenSale.getAdmin()
             .then(function(res) {
                 existing_admin = res;
                 console.log('Existing admin: ' + existing_admin);
-                return thetaTokenSale.getThetaLabsReserve({from: existing_admin, gas: 4700000});
+                return bitwebTokenSale.getThetaLabsReserve({from: existing_admin, gas: 4700000});
             })
             .then(function(res) {
                 existing_thetalab_reserve = res;
                 console.log('Existing thetaLab reserver address: ' + existing_thetalab_reserve);
                 new_thetalab_reserve_candidate = accounts[0];
-                return thetaTokenSale.changeThetaLabsReserve(new_thetalab_reserve_candidate, {from: existing_admin, gas: 4700000});
+                return bitwebTokenSale.changeThetaLabsReserve(new_thetalab_reserve_candidate, {from: existing_admin, gas: 4700000});
             })
             .then(function() {
-                return thetaTokenSale.getThetaLabsReserve({from: existing_admin, gas: 4700000});
+                return bitwebTokenSale.getThetaLabsReserve({from: existing_admin, gas: 4700000});
             })
             .then(function(res) {
                 new_thetalab_reserve = res;
@@ -366,22 +366,22 @@ contract('ThetaTokenSale', function(accounts) {
             ;
     });
 
-    it ("ThetaTokenSale: transfer root", function() {
+    it ("BitWebTokenSale: transfer root", function() {
         console.log('----------------');
-        return thetaTokenSale.getAdmin()
+        return bitwebTokenSale.getAdmin()
             .then(function(res) {
                 existing_admin = res;
                 console.log('Existing admin: ' + existing_admin);
-                return thetaTokenSale.getRoot({from: existing_admin, gas: 4700000});
+                return bitwebTokenSale.getRoot({from: existing_admin, gas: 4700000});
             })
             .then(function(res) {
                 existing_root = res;
                 console.log('Existing root: ' + existing_root);
                 new_root_candidate = accounts[6];
-                return thetaTokenSale.changeRoot(new_root_candidate, {from: existing_root, gas: 4700000});
+                return bitwebTokenSale.changeRoot(new_root_candidate, {from: existing_root, gas: 4700000});
             })
             .then(function() {
-                return thetaTokenSale.getRoot({from: existing_admin, gas: 4700000});
+                return bitwebTokenSale.getRoot({from: existing_admin, gas: 4700000});
             })
             .then(function(res) {
                 new_root = res;
@@ -391,22 +391,22 @@ contract('ThetaTokenSale', function(accounts) {
             ;
     });
 
-    it ("ThetaTokenSale: transfer admin with new root", function() {
+    it ("BitWebTokenSale: transfer admin with new root", function() {
         console.log('----------------');
-        return thetaTokenSale.getAdmin()
+        return bitwebTokenSale.getAdmin()
             .then(function(res) {
                 existing_admin = res;
                 console.log('Existing admin: ' + existing_admin);
-                return thetaTokenSale.getRoot({from: existing_admin, gas: 4700000});
+                return bitwebTokenSale.getRoot({from: existing_admin, gas: 4700000});
             })
             .then(function(res) {
                 existing_root = res;
                 console.log('Existing root: ' + existing_root);
                 new_admin_candidate = accounts[9];
-                return thetaTokenSale.changeAdmin(new_admin_candidate, {from: existing_root, gas: 4700000});
+                return bitwebTokenSale.changeAdmin(new_admin_candidate, {from: existing_root, gas: 4700000});
             })
             .then(function() {
-                return thetaTokenSale.getAdmin({from: new_admin_candidate, gas: 4700000});
+                return bitwebTokenSale.getAdmin({from: new_admin_candidate, gas: 4700000});
             })
             .then(function(res) {
                 new_admin = res;
@@ -416,13 +416,13 @@ contract('ThetaTokenSale', function(accounts) {
             ;
     });
 
-    it ("ThetaTokenSale: test new admin", function() {
+    it ("BitWebTokenSale: test new admin", function() {
         console.log('----------------');
         console.log('Use new admin to change fund deposit..');
         new_admin = accounts[9];
-        return thetaTokenSale.changeFundDeposit(accounts[4], {from: new_admin, gas: 4700000})
+        return bitwebTokenSale.changeFundDeposit(accounts[4], {from: new_admin, gas: 4700000})
             .then(function() {
-                return thetaTokenSale.getFundDeposit({from: new_admin, gas: 4700000});
+                return bitwebTokenSale.getFundDeposit({from: new_admin, gas: 4700000});
             })
             .then(function(res) {
                 new_fund_deposit = res;
@@ -430,10 +430,10 @@ contract('ThetaTokenSale', function(accounts) {
                 assert.equal(new_fund_deposit, accounts[4], 'Fund deposit should have been changed');
 
                 console.log('Use new admin to change whitelistController..');
-                return thetaTokenSale.changeWhitelistController(accounts[2], {from: new_admin, gas: 4700000});
+                return bitwebTokenSale.changeWhitelistController(accounts[2], {from: new_admin, gas: 4700000});
             })
             .then(function() {
-                return thetaTokenSale.getWhitelistController({from: new_admin, gas: 4700000});
+                return bitwebTokenSale.getWhitelistController({from: new_admin, gas: 4700000});
             })
             .then(function(res) {
                 new_whitelist_controller = res;
@@ -441,10 +441,10 @@ contract('ThetaTokenSale', function(accounts) {
                 assert.equal(new_whitelist_controller == accounts[2], true, 'new whitelist controller should be updated');
 
                 console.log('Use new admin to change exchangeRateController..');
-                return thetaTokenSale.changeExchangeRateController(accounts[2], {from: new_admin, gas: 4700000});
+                return bitwebTokenSale.changeExchangeRateController(accounts[2], {from: new_admin, gas: 4700000});
             })
             .then(function() {
-                return thetaTokenSale.getExchangeRateController({from: new_admin, gas: 4700000});
+                return bitwebTokenSale.getExchangeRateController({from: new_admin, gas: 4700000});
             })
             .then(function(res) {
                 new_exchange_rate_controller = res;
@@ -454,19 +454,19 @@ contract('ThetaTokenSale', function(accounts) {
             ;
     });
 
-    it ("ThetaTokenSale: test new whitelist controller", function() {
+    it ("BitWebTokenSale: test new whitelist controller", function() {
         console.log('----------------');
         console.log('Use new whitelistController to whitelist');
         console.log('Adding these accounts to whitelist: ' + accounts[8] + ' ' + accounts[9]);
         new_whitelist_controller = accounts[2];
-        return thetaTokenSale.addAccountsToWhitelist([accounts[8], accounts[9]], {from: accounts[2], gas:4700000})
+        return bitwebTokenSale.addAccountsToWhitelist([accounts[8], accounts[9]], {from: accounts[2], gas:4700000})
             .then(function() {
-                return thetaTokenSale.isWhitelisted(accounts[8]);
+                return bitwebTokenSale.isWhitelisted(accounts[8]);
             })
             .then(function(res) {
                 console.log('is ' + accounts[8] + ' whitelisted? ' + res);
                 assert.equal(res, true, 'Account should have been whitelisted');
-                return thetaTokenSale.isWhitelisted(accounts[9]);
+                return bitwebTokenSale.isWhitelisted(accounts[9]);
             })
             .then(function(res) {
                 console.log('is ' + accounts[9] + ' whitelisted? ' + res);
@@ -475,19 +475,19 @@ contract('ThetaTokenSale', function(accounts) {
             ;
     });
 
-    it ("ThetaTokenSale: test exchange rate with new controller", function() {
+    it ("BitWebTokenSale: test exchange rate with new controller", function() {
         console.log('----------------');
         console.log('Use new exchange rate to set exchange rate');
-        return thetaTokenSale.exchangeRate.call()
+        return bitwebTokenSale.exchangeRate.call()
             .then(function(res) {
                 console.log('Exisitng exchange rate: ' + res);
                 new_exchange_rate_controller = accounts[2];
                 new_exchange_rate = 54321;
                 console.log('Changing exchange rate to ' + new_exchange_rate.toString());
-                return thetaTokenSale.setExchangeRate(new_exchange_rate, {from: new_exchange_rate_controller, gas:4700000});
+                return bitwebTokenSale.setExchangeRate(new_exchange_rate, {from: new_exchange_rate_controller, gas:4700000});
             })
             .then(function() {
-                return thetaTokenSale.exchangeRate.call();
+                return bitwebTokenSale.exchangeRate.call();
             })
             .then(function(res) {
                 console.log('New exchange rate: ' + res);
