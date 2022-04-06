@@ -2,6 +2,7 @@ pragma solidity ^0.4.18;
 
 //
 //    Copyright 2017, Theta Labs, Inc.
+//    Copyright 2022, BitWeb Labs
 //
 
 contract Token {
