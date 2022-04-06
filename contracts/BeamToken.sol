@@ -5,6 +5,7 @@ import "./StandardToken.sol";
 
 //
 //    Copyright 2017, Theta Labs, Inc.
+//    Copyright 2022, BitWeb Labs
 //
 
 contract Controlled {
@@ -31,23 +32,23 @@ contract Controlled {
 }
 
 
-contract ThetaToken is StandardToken, Controlled {
+contract BeamToken is StandardToken, Controlled {
     
     using SafeMath for uint;
 
-    string public constant name = "Theta Token";
+    string public constant name = "BitWeb BEAM Token";
 
-    string public constant symbol = "THETA";
+    string public constant symbol = "BEAM";
 
     uint8 public constant decimals = 18;
 
     // tokens can be transferred amoung holders only after unlockTime
     uint unlockTime;
     
-    // for token circulation on platforms that integrate Theta before unlockTime
+    // for token circulation on platforms that integrate BEAM before unlockTime
     mapping (address => bool) internal precirculated;
 
-    function ThetaToken(uint _unlockTime) public {
+    function BeamToken(uint _unlockTime) public {
         unlockTime = _unlockTime;
     }
 
