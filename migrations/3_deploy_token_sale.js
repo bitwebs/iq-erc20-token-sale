@@ -1,11 +1,11 @@
-var ThetaTokenSale = artifacts.require('ThetaTokenSale');
+var BitWebTokenSale = artifacts.require('BitWebTokenSale');
 
 module.exports = function (deployer, network, accounts) {
     var rootAddr     = '';
     var deployerAddr = '';
     var whiteListControllerAddr    = '';
     var exchangeRateControllerAddr = '';
-    var thetaLabReserveAddr = '';
+    var bitwebLabReserveAddr = '';
     var fundDepositAddr     = '';
 
     var initialBlock = 223583611111;
@@ -13,8 +13,8 @@ module.exports = function (deployer, network, accounts) {
     var exchangeRate = 30000;
 
     console.log('---------3----------');
-    deployer.deploy(ThetaTokenSale, rootAddr, deployerAddr, 
-        whiteListControllerAddr, exchangeRateControllerAddr, thetaLabReserveAddr, fundDepositAddr,
+    deployer.deploy(BitWebTokenSale, rootAddr, deployerAddr, 
+        whiteListControllerAddr, exchangeRateControllerAddr, bitwebLabReserveAddr, fundDepositAddr,
         initialBlock, finalBlock, exchangeRate);
 };
 
